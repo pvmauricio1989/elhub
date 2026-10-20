@@ -1,0 +1,18 @@
+{
+  // Nombre del Worker (será la URL el-hub.<tu-subdominio>.workers.dev)
+  "name": "el-hub",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "HUB",
+      // Paso 2 de la guía: pega aquí el ID de tu KV namespace
+      "id": "PEGA_AQUI_EL_ID_DE_TU_KV"
+    }
+  ],
+  "observability": { "enabled": true }
+}

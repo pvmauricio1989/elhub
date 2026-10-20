@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El HUB</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fraunces:opsz,wght@9..144,300;9..144,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --forest:#173a29;--fern:#3e7b4f;--moss:#8db580;--mist:#eef3ea;--plumeria:#f2c14e;--lagoon:#2f7d7a;
+  --ink:#1c2b22;--ink-soft:#4b5d51;--panel:rgba(244,248,240,.80);--panel-line:rgba(255,255,255,.65);
+  --frame:#173a29;--field:#ffffff;--field-line:#c9d6c3;--page:#cfe3cf;--scrim:rgba(15,35,24,.55);
+  --danger:#b3412f;--dlg:#eef3ea;--row:rgba(23,58,41,.06);
+  --r-card:7px;--r-inner:4px;--r-ctl:5px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#e9f1e4;--ink-soft:#a9bda9;--panel:rgba(18,38,28,.78);--panel-line:rgba(141,181,128,.25);
+    --frame:#0c2016;--field:#11251a;--field-line:#2f4a38;--page:#0e2318;--scrim:rgba(0,0,0,.6);
+    --danger:#ef8a76;--dlg:#132a1e;--row:rgba(255,255,255,.05);color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e9f1e4;--ink-soft:#a9bda9;--panel:rgba(18,38,28,.78);--panel-line:rgba(141,181,128,.25);
+  --frame:#0c2016;--field:#11251a;--field-line:#2f4a38;--page:#0e2318;--scrim:rgba(0,0,0,.6);
+  --danger:#ef8a76;--dlg:#132a1e;--row:rgba(255,255,255,.05);color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;min-height:100%}
+body{background:var(--page);color:var(--ink);font-family:"Jost","Avenir Next","Century Gothic","Segoe UI",sans-serif;font-weight:300;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--plumeria);outline-offset:3px}
+
+/* ---------- Landscape ---------- */
+#scene{position:fixed;inset:0;z-index:0;overflow:hidden}
+#scene svg{width:100%;height:100%;display:block}
+.mist-drift{animation:drift 70s ease-in-out infinite alternate}
+.mist-drift.slow{animation-duration:110s;animation-direction:alternate-reverse}
+@keyframes drift{from{transform:translateX(-4%)}to{transform:translateX(4%)}}
+@media (prefers-reduced-motion:reduce){.mist-drift{animation:none}}
+#scene::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,30,20,.35) 0%,rgba(10,30,20,0) 30%,rgba(10,30,20,0) 60%,rgba(10,30,20,.45) 100%)}
+
+
+
+/* ---------- Shell ---------- */
+.shell{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem clamp(1rem,4vw,3rem);flex-wrap:wrap}
+.mark{font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:1.5rem;color:#fff;letter-spacing:.02em;text-shadow:0 1px 12px rgba(0,0,0,.35)}
+.mark small{font-family:"Jost",sans-serif;font-size:.8rem;opacity:.85;margin-right:.35rem}
+.top-actions{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.hello{color:#fff;font-size:.9rem;margin-right:.3rem;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.ghost{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.55);color:#fff;padding:.42rem .95rem;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:.88rem;font-weight:400;border-radius:var(--r-ctl)}
+.ghost:hover{background:rgba(255,255,255,.24)}
+.ghost[aria-pressed="true"]{background:var(--plumeria);border-color:var(--plumeria);color:#1c2b22}
+
+.hero{text-align:center;padding:clamp(1.8rem,7vh,4.5rem) 1rem clamp(1.8rem,5vh,3rem);color:#fff}
+.hero h1{font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:clamp(4rem,14vw,9rem);line-height:.9;margin:0;letter-spacing:-.02em;text-shadow:0 4px 40px rgba(0,30,15,.45)}
+.hero p{margin:1rem auto 0;max-width:34ch;font-size:clamp(1rem,2.2vw,1.15rem);text-shadow:0 1px 10px rgba(0,0,0,.5)}
+.banner{max-width:1040px;margin:0 auto 1.1rem;padding:.6rem 1rem;background:var(--plumeria);color:#1c2b22;font-weight:400;text-align:center;border-radius:var(--r-ctl);font-size:.9rem}
+.banner.demo{background:rgba(255,255,255,.85)}
+.edit-banner{display:none}
+body.editing .edit-banner{display:block}
+
+/* ---------- Cards (compact) ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:clamp(.8rem,1.6vw,1.1rem);max-width:1040px;width:100%;margin:0 auto;padding:0 clamp(1rem,4vw,2rem) 3.5rem}
+.card{position:relative;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--r-card);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);padding:.7rem .7rem .95rem;display:flex;flex-direction:column;align-items:center;text-align:center}
+.emblem{width:100%;aspect-ratio:16/10;background:var(--frame);display:grid;place-items:center;position:relative;overflow:hidden;border-radius:var(--r-inner)}
+.emblem svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.emblem svg.icon{position:relative;width:32%;height:auto;color:var(--mist)}
+.card h2{font-family:"Jost",sans-serif;font-weight:300;font-size:1.08rem;line-height:1.2;margin:.7rem 0 0;color:var(--ink)}
+.rule{width:1.8rem;height:5px;border-top:1.25px solid var(--ink);border-bottom:1.25px solid var(--ink);margin:.55rem auto;opacity:.75}
+.card p{margin:0 0 .8rem;color:var(--ink-soft);font-size:.8rem;line-height:1.4;max-width:24ch;flex:1}
+.open{display:inline-block;padding:.32rem .9rem;background:var(--field);border:1px solid var(--ink);color:var(--ink);text-decoration:none;font-size:.76rem;font-weight:400;border-radius:var(--r-ctl)}
+.open:hover{background:var(--forest);color:#fff;border-color:var(--forest)}
+.open[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.card-edit{position:absolute;top:.45rem;right:.45rem;display:none;background:var(--plumeria);border:0;color:#1c2b22;padding:.2rem .55rem;cursor:pointer;font-weight:500;font-size:.75rem;z-index:2;border-radius:var(--r-inner)}
+body.editing .card-edit{display:block}
+body.editing .card{outline:1px dashed var(--plumeria);outline-offset:3px}
+.add-card{display:none;min-height:200px;border:1.5px dashed rgba(255,255,255,.8);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.95rem;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:var(--r-card)}
+.add-card:hover{background:rgba(255,255,255,.2)}
+body.editing .add-card{display:grid;place-items:center}
+.empty{grid-column:1/-1;background:var(--panel);border-radius:var(--r-card);padding:1.5rem;text-align:center;color:var(--ink-soft)}
+footer{margin-top:auto;text-align:center;color:rgba(255,255,255,.85);font-size:.85rem;padding:1rem 1rem 1.5rem;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+
+/* ---------- Login ---------- */
+.login{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;padding:1.5rem}
+.login-panel{width:min(370px,100%);background:var(--panel);border:1px solid var(--panel-line);border-radius:10px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:2.1rem 1.9rem 1.9rem;text-align:center}
+.login-panel h1{font-family:"Fraunces",Georgia,serif;font-weight:300;font-size:3.3rem;margin:0;line-height:1}
+.login-panel .rule{width:2.4rem;height:7px;margin:1rem auto 1.4rem}
+.field{display:block;text-align:left;margin-bottom:.9rem}
+.field>span{display:block;font-size:.85rem;color:var(--ink-soft);margin-bottom:.3rem;font-weight:400}
+.field input,.field textarea,.field select{width:100%;padding:.55rem .7rem;background:var(--field);border:1px solid var(--field-line);border-radius:var(--r-ctl)}
+.field textarea{resize:vertical;min-height:4rem}
+.primary{width:100%;padding:.68rem 1rem;background:var(--forest);color:#fff;border:1px solid var(--forest);cursor:pointer;font-weight:400;border-radius:var(--r-ctl)}
+.primary:hover{background:var(--fern);border-color:var(--fern)}
+.primary:disabled{opacity:.6;cursor:wait}
+.error{color:var(--danger);font-size:.88rem;min-height:1.3rem;margin:.2rem 0 .6rem}
+.hint{font-size:.8rem;color:var(--ink-soft);margin:1rem 0 0}
+
+/* ---------- Dialogs ---------- */
+dialog{border:0;padding:0;background:transparent;max-width:min(540px,calc(100% - 2rem));width:100%;color:var(--ink)}
+dialog::backdrop{background:var(--scrim);backdrop-filter:blur(3px)}
+.dlg{background:var(--dlg);padding:1.5rem 1.5rem 1.3rem;border-radius:10px;max-height:calc(100vh - 3rem);overflow:auto}
+.dlg h3{font-family:"Jost",sans-serif;font-weight:400;font-size:1.3rem;margin:0 0 1rem}
+.icon-pick{display:flex;flex-wrap:wrap;gap:.4rem}
+.icon-pick label{cursor:pointer;position:relative}
+.icon-pick input{position:absolute;opacity:0;pointer-events:none}
+.icon-pick .sw{display:grid;place-items:center;width:44px;height:44px;background:var(--frame);border:2px solid transparent;color:var(--mist);border-radius:var(--r-ctl)}
+.icon-pick .sw svg{width:22px;height:22px}
+.icon-pick input:checked+.sw{border-color:var(--plumeria)}
+.icon-pick input:focus-visible+.sw{outline:2px solid var(--plumeria);outline-offset:2px}
+.dlg-actions{display:flex;gap:.6rem;justify-content:space-between;align-items:center;margin-top:1.1rem;flex-wrap:wrap}
+.dlg-actions .right{display:flex;gap:.6rem;margin-left:auto}
+.btn{padding:.5rem 1rem;border:1px solid var(--ink);background:transparent;cursor:pointer;border-radius:var(--r-ctl);font-size:.92rem}
+.btn.solid{background:var(--forest);border-color:var(--forest);color:#fff}
+.btn.del{border-color:var(--danger);color:var(--danger)}
+.btn.sm{padding:.25rem .65rem;font-size:.82rem}
+.users{list-style:none;margin:0 0 .4rem;padding:0;display:grid;gap:.45rem}
+.users li{display:flex;align-items:center;gap:.7rem;background:var(--row);padding:.6rem .75rem;border-radius:var(--r-ctl)}
+.users .who{flex:1;min-width:0}
+.users .who b{font-weight:500;display:block}
+.users .who small{color:var(--ink-soft);font-size:.8rem}
+.tag{font-size:.72rem;padding:.08rem .45rem;border-radius:20px;background:var(--plumeria);color:#1c2b22;margin-left:.35rem;font-weight:500;vertical-align:1px}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.35rem .8rem;padding:.6rem .7rem;background:var(--field);border:1px solid var(--field-line);border-radius:var(--r-ctl)}
+.checks label{display:flex;gap:.5rem;align-items:center;font-size:.92rem;cursor:pointer}
+.checks input{accent-color:var(--fern);width:1rem;height:1rem}
+.checks.off{opacity:.55}
+.note{font-size:.8rem;color:var(--ink-soft);margin:.35rem 0 0}
+.toast{position:fixed;left:50%;bottom:calc(1.5rem + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--forest);color:#fff;padding:.6rem 1.2rem;z-index:20;opacity:0;transition:opacity .25s;pointer-events:none;border-radius:var(--r-ctl)}
+.toast.show{opacity:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div id="scene" aria-hidden="true"></div>
+
+<main class="login" id="loginView" hidden>
+  <form class="login-panel" id="loginForm" autocomplete="on">
+    <h1>El HUB</h1>
+    <div class="rule"></div>
+    <label class="field"><span>Usuario</span><input id="lu" name="username" autocomplete="username" autocapitalize="none" required></label>
+    <label class="field"><span>Contraseña</span><input id="lp" name="password" type="password" autocomplete="current-password" required></label>
+    <p class="error" id="loginErr" role="alert"></p>
+    <button class="primary" type="submit" id="loginBtn">Entrar</button>
+    <p class="hint" id="loginHint">Acceso privado a los portales de maurosystem.com</p>
+  </form>
+</main>
+
+<div class="shell" id="hubView" hidden>
+  <header class="topbar">
+    <div class="mark"><small>maurosystem.com</small>El HUB</div>
+    <div class="top-actions">
+      <span class="hello" id="hello"></span>
+      <button class="ghost admin-only" id="editToggle" aria-pressed="false">Editar portales</button>
+      <button class="ghost admin-only" id="usersBtn">Usuarios</button>
+      <button class="ghost" id="pwBtn">Mi contraseña</button>
+      <button class="ghost" id="logoutBtn">Salir</button>
+    </div>
+  </header>
+  <section class="hero">
+    <h1>El HUB</h1>
+    <p>Todos los portales de maurosystem.com en un solo lugar</p>
+  </section>
+  <div class="banner demo" id="demoBanner" hidden>Vista previa: los cambios no se guardan. Al publicarlo en Cloudflare, todo queda guardado.</div>
+  <div class="banner edit-banner">Modo edición: toca “Editar” en un bloque para cambiar su nombre, descripción o enlace.</div>
+  <section class="grid" id="grid" aria-label="Portales"></section>
+  <footer>maurosystem.com</footer>
+</div>
+
+<!-- Portal -->
+<dialog id="editDlg">
+  <form class="dlg" id="editForm">
+    <h3 id="editTitle">Editar portal</h3>
+    <label class="field"><span>Nombre</span><input id="fName" required maxlength="40"></label>
+    <label class="field"><span>Descripción breve</span><textarea id="fDesc" maxlength="140"></textarea></label>
+    <label class="field"><span>Enlace (URL)</span><input id="fUrl" type="url" placeholder="https://..." required></label>
+    <div class="field"><span>Ícono</span><div class="icon-pick" id="iconPick"></div></div>
+    <p class="error" id="editErr" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn del" id="delBtn">Eliminar portal</button>
+      <div class="right">
+        <button type="button" class="btn" data-close="editDlg">Cancelar</button>
+        <button type="submit" class="btn solid">Guardar portal</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<!-- Users list -->
+<dialog id="usersDlg">
+  <div class="dlg">
+    <h3>Usuarios</h3>
+    <ul class="users" id="usersList"></ul>
+    <div class="dlg-actions">
+      <button type="button" class="btn solid" id="newUserBtn">Nuevo usuario</button>
+      <div class="right"><button type="button" class="btn" data-close="usersDlg">Cerrar</button></div>
+    </div>
+  </div>
+</dialog>
+
+<!-- User form -->
+<dialog id="userDlg">
+  <form class="dlg" id="userForm">
+    <h3 id="userTitle">Nuevo usuario</h3>
+    <label class="field"><span>Nombre</span><input id="uName" maxlength="60" required></label>
+    <label class="field"><span>Usuario para entrar</span><input id="uUser" maxlength="32" autocapitalize="none" autocomplete="off" required></label>
+    <label class="field"><span id="uPassLabel">Contraseña (mínimo 8 caracteres)</span><input id="uPass" type="password" autocomplete="new-password"></label>
+    <label class="field"><span>Rol</span>
+      <select id="uRole"><option value="user">Usuario: ve solo los bloques marcados</option><option value="admin">Administrador: ve todo y administra</option></select>
+    </label>
+    <div class="field"><span>Bloques que puede ver</span><div class="checks" id="uChecks"></div><p class="note" id="uNote" hidden>Los administradores ven todos los bloques.</p></div>
+    <p class="error" id="userErr" role="alert"></p>
+    <div class="dlg-actions"><div class="right">
+      <button type="button" class="btn" data-close="userDlg">Cancelar</button>
+      <button type="submit" class="btn solid">Guardar usuario</button>
+    </div></div>
+  </form>
+</dialog>
+
+<!-- Own password -->
+<dialog id="pwDlg">
+  <form class="dlg" id="pwForm">
+    <h3>Cambiar mi contraseña</h3>
+    <label class="field"><span>Contraseña actual</span><input id="pCur" type="password" autocomplete="current-password" required></label>
+    <label class="field"><span>Nueva contraseña (mínimo 8 caracteres)</span><input id="pNew" type="password" autocomplete="new-password" minlength="8" required></label>
+    <p class="error" id="pwErr" role="alert"></p>
+    <div class="dlg-actions"><div class="right">
+      <button type="button" class="btn" data-close="pwDlg">Cancelar</button>
+      <button type="submit" class="btn solid">Guardar contraseña</button>
+    </div></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+function rng(seed){return function(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}}
+function buildScene(){
+  const W=1600,H=1000,r=rng(7);
+  const svgNS="http://www.w3.org/2000/svg";
+  let s=`<svg xmlns="${svgNS}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fb7b0"/><stop offset=".45" stop-color="#cfe3c8"/><stop offset=".7" stop-color="#f6e7b8"/><stop offset="1" stop-color="#f3d9a0"/>
+    </linearGradient>
+    <radialGradient id="sun" cx=".72" cy=".42" r=".35"><stop offset="0" stop-color="#fff6d6" stop-opacity=".95"/><stop offset="1" stop-color="#fff6d6" stop-opacity="0"/></radialGradient>
+    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7aa596"/><stop offset="1" stop-color="#a9c6b3"/></linearGradient>
+    <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f8a5f"/><stop offset="1" stop-color="#6f9e70"/></linearGradient>
+    <linearGradient id="main" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f7a45"/><stop offset=".55" stop-color="#2a5f36"/><stop offset="1" stop-color="#1b4227"/></linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb3ac"/><stop offset="1" stop-color="#1f6f78"/></linearGradient>
+    <linearGradient id="fall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".2"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="1.2"/></filter>
+  </defs>
+  <rect width="${W}" height="${H}" fill="url(#sky)"/>
+  <rect width="${W}" height="${H}" fill="url(#sun)"/>`;
+
+  // ridge polyline helper
+  function ridgePts(y0,amp,step,seed,peaks){
+    const rr=rng(seed),pts=[];
+    for(let x=-40;x<=W+40;x+=step){
+      let y=y0;
+      peaks.forEach(p=>{const d=(x-p[0])/p[2];y-=p[1]*Math.exp(-d*d)});
+      y+= (rr()-.5)*amp;
+      pts.push([x,y]);
+    }
+    return pts;
+  }
+  function area(pts,fill,extra=""){return `<path d="M${pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" L")} L${W+40},${H} L-40,${H} Z" fill="${fill}" ${extra}/>`}
+
+  // distant ridges
+  const far=ridgePts(560,14,30,3,[[300,170,220],[900,120,260],[1350,190,200]]);
+  s+=area(far,"url(#far)",'opacity=".9"');
+  s+=`<g class="mist-drift slow"><ellipse cx="700" cy="560" rx="900" ry="60" fill="#fff" opacity=".55" filter="url(#blur)"/></g>`;
+
+  // ocean (left/bottom)
+  s+=`<path d="M-40,760 C300,742 520,750 760,770 L760,${H} L-40,${H} Z" fill="url(#sea)"/>`;
+  for(let i=0;i<14;i++){const y=770+i*16+r()*6,x=-40+r()*500;s+=`<path d="M${x},${y} q30,-4 60,0" stroke="#e8fbf6" stroke-opacity="${.25+r()*.35}" stroke-width="1.5" fill="none"/>`}
+
+  // mid ridge
+  const mid=ridgePts(700,10,24,11,[[1100,260,260],[1500,180,180],[600,90,180]]);
+  s+=area(mid,"url(#mid)");
+
+  // MAIN fluted massif
+  const peaks=[[620,420,170],[880,520,150],[1120,470,170],[1360,560,160],[1560,430,160]];
+  const main=ridgePts(860,22,12,21,peaks);
+  s+=area(main,"url(#main)");
+  // flutes: deep green valleys + sunlit spines, following each crest point down
+  let flutes="";
+  const rr=rng(99);
+  for(let i=2;i<main.length-2;i+=2){
+    const [x,y]=main[i]; if(y>820) continue;
+    const len=H-y, lean=(x>1000?1:-1)*(10+rr()*30);
+    const w=4+rr()*9;
+    const cx=x+lean*.5, ex=x+lean;
+    flutes+=`<path d="M${x},${y+4} Q${cx},${y+len*.5} ${ex},${H}" stroke="#123421" stroke-opacity="${.35+rr()*.35}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
+    flutes+=`<path d="M${x+w*.6},${y+2} Q${cx+w*.6},${y+len*.45} ${ex+w},${H}" stroke="#9fcf86" stroke-opacity="${.18+rr()*.28}" stroke-width="${1+rr()*2.2}" fill="none" stroke-linecap="round" filter="url(#soft)"/>`;
+  }
+  s+=`<g>${flutes}</g>`;
+  // crest light rim
+  s+=`<path d="M${main.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" L")}" stroke="#d9f0b8" stroke-opacity=".55" stroke-width="2" fill="none"/>`;
+
+  // waterfall
+  s+=`<path d="M1006,520 C1004,600 1010,680 1004,780" stroke="url(#fall)" stroke-width="5" fill="none"/>
+      <path d="M1006,520 C1004,600 1010,680 1004,780" stroke="#fff" stroke-opacity=".6" stroke-width="1.5" fill="none"/>
+      <ellipse cx="1004" cy="786" rx="40" ry="10" fill="#fff" opacity=".5" filter="url(#blur)"/>`;
+
+  // low clouds clinging to the cliffs
+  s+=`<g class="mist-drift"><ellipse cx="1000" cy="470" rx="420" ry="34" fill="#fff" opacity=".5" filter="url(#blur)"/><ellipse cx="1400" cy="610" rx="300" ry="28" fill="#fff" opacity=".45" filter="url(#blur)"/><ellipse cx="560" cy="700" rx="380" ry="40" fill="#fff" opacity=".35" filter="url(#blur)"/></g>`;
+
+  // foreground jungle hill
+  const fg=ridgePts(925,30,16,41,[[200,60,260],[1500,90,240]]);
+  s+=area(fg,"#143521");
+  // palms
+  function palm(x,base,h,lean,scale){
+    const tx=x+lean,ty=base-h;
+    let p=`<path d="M${x},${base} Q${x+lean*.3},${base-h*.55} ${tx},${ty}" stroke="#0e2a19" stroke-width="${7*scale}" fill="none" stroke-linecap="round"/>`;
+    const fronds=[[-150,.9],[-120,1],[-80,1],[-40,.9],[-10,.85],[20,.9],[-170,.75],[0,.7]];
+    fronds.forEach(([a,l])=>{
+      const rad=a*Math.PI/180,L=120*l*scale;
+      const ex=tx+Math.cos(rad)*L,ey=ty+Math.sin(rad)*L*.55+L*.45;
+      const mx=tx+Math.cos(rad)*L*.5,my=ty+Math.sin(rad)*L*.5-L*.08;
+      p+=`<path d="M${tx},${ty} Q${mx},${my-12*scale} ${ex},${ey} Q${mx},${my+6*scale} ${tx},${ty}" fill="#0e2a19"/>`;
+    });
+    return p;
+  }
+  s+=palm(90,960,330,40,1.15)+palm(210,975,250,-30,.9)+palm(1490,950,300,-45,1.05)+palm(1560,980,210,25,.8);
+  // ferns along the bottom edge
+  let ferns="";const fr=rng(5);
+  for(let x=-20;x<W+20;x+=26){const h=30+fr()*60;ferns+=`<path d="M${x},${H} q${8+fr()*10},-${h} ${-10+fr()*30},-${h*1.2}" stroke="#0b2415" stroke-width="${3+fr()*4}" fill="none" stroke-linecap="round"/>`}
+  s+=ferns;
+  // hibiscus/plumeria dots for a touch of colour
+  for(let i=0;i<22;i++){const x=r()*W,y=H-10-r()*55;s+=`<circle cx="${x}" cy="${y}" r="${2+r()*3}" fill="${r()>.5?"#f2c14e":"#f4a6a0"}" opacity=".85"/>`}
+
+  s+=`</svg>`;
+  document.getElementById("scene").innerHTML=s;
+}
+buildScene();
+
+const ICONS={
+  cockpit:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 32a16 16 0 1 1 32 0"/><path d="M24 32l9-10"/><circle cx="24" cy="32" r="2.5" fill="currentColor"/><path d="M12 24l3 1.5M24 16v3M36 24l-3 1.5"/></svg>',
+  shield:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M24 6l15 6v10c0 10-7 17-15 20C16 39 9 32 9 22V12z"/><path d="M17 24l5 5 9-10" stroke-linecap="round"/></svg>',
+  board:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="9" width="34" height="30"/><path d="M7 18h34M19 18v21"/><path d="M24 33l5-6 4 3 5-7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  sprout:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 42V24"/><path d="M24 26c0-8-6-13-14-13 0 8 6 13 14 13z"/><path d="M24 22c0-7 5-12 13-12 0 7-5 12-13 12z"/><path d="M16 42h16"/></svg>',
+  coins:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 22L24 9l16 13"/><path d="M12 19v20h24V19"/><circle cx="24" cy="29" r="5"/><path d="M24 26v6" stroke-linecap="round"/></svg>',
+  family:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="16" cy="15" r="5"/><circle cx="32" cy="15" r="5"/><circle cx="24" cy="27" r="3.5"/><path d="M7 40c0-7 4-12 9-12M41 40c0-7-4-12-9-12M17 40c0-4 3-7 7-7s7 3 7 7"/></svg>',
+  leaf:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 38C10 20 22 9 40 9c0 18-11 29-29 29"/><path d="M10 38l16-16"/></svg>',
+  link:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 27a7 7 0 0 0 10 0l6-6a7 7 0 0 0-10-10l-2 2"/><path d="M27 21a7 7 0 0 0-10 0l-6 6a7 7 0 0 0 10 10l2-2"/></svg>'
+};
+const TINTS=["#3e7b4f","#2f7d7a","#5b8f3a","#8a6f3c","#4d7a6b","#6d8a3f","#2c6a52","#7b6a8f"];
+
+
+
+/* ================= API (real o vista previa) ================= */
+let DEMO=false, me=null, portals=[], adminState=null;
+
+async function api(method,path,body){
+  if(DEMO) return mock(method,path,body);
+  const r=await fetch(path,{method,credentials:"same-origin",headers:body?{"Content-Type":"application/json"}:{},body:body?JSON.stringify(body):undefined});
+  const data=await r.json().catch(()=>({}));
+  if(r.status===401&&path!=="/api/login"){expired();throw new Error(data.error||"Tu sesión expiró.")}
+  if(!r.ok) throw new Error(data.error||"Algo falló. Intenta de nuevo.");
+  return data;
+}
+
+// --- Vista previa sin servidor (solo cuando no existe /api) ---
+const DEMO_PORTALS=[
+  {id:"cockpit",name:"SE Cockpit Idira",desc:"Panel de control de ingeniería de ventas para Idira.",url:"https://maurosystem.com/cockpit",icon:"cockpit"},
+  {id:"paloalto",name:"Palo Alto",desc:"Portal de seguridad y redes Palo Alto Networks.",url:"https://maurosystem.com/paloalto",icon:"shield"},
+  {id:"tablero",name:"El Tablero",desc:"Indicadores y métricas clave en una sola vista.",url:"https://maurosystem.com/tablero",icon:"board"},
+  {id:"embarazo",name:"Seguimiento de embarazo",desc:"Semana a semana: controles, citas y recuerdos.",url:"https://maurosystem.com/embarazo",icon:"sprout"},
+  {id:"finanzas",name:"Finanzas Casa",desc:"Presupuesto, gastos y ahorro del hogar.",url:"https://maurosystem.com/finanzas",icon:"coins"},
+  {id:"familiar",name:"Portal Familiar",desc:"Calendario, fotos y novedades de la familia.",url:"https://maurosystem.com/familia",icon:"family"}
+];
+const M={portals:DEMO_PORTALS.map(p=>({...p})),session:null,users:{
+  admin:{username:"admin",name:"Administrador",role:"admin",pw:"ElHub2026!",portals:[]},
+  familia:{username:"familia",name:"Familia",role:"user",pw:"familia123",portals:["embarazo","finanzas","familiar"]}}};
+const pub=u=>({username:u.username,name:u.name,role:u.role,portals:u.portals});
+async function mock(method,path,b){
+  const fail=m=>{throw new Error(m)};
+  if(path==="/api/login"){const u=M.users[(b.username||"").toLowerCase()];if(!u||u.pw!==b.password)fail("Usuario o contraseña incorrectos.");M.session=u.username;return{user:pub(u)}}
+  if(path==="/api/logout"){M.session=null;return{ok:true}}
+  const cur=M.users[M.session];if(!cur){expired();fail("Tu sesión expiró.")}
+  if(path==="/api/me")return{user:pub(cur),portals:cur.role==="admin"?M.portals:M.portals.filter(p=>cur.portals.includes(p.id))};
+  if(path==="/api/password"){if(b.current!==cur.pw)fail("La contraseña actual no coincide.");cur.pw=b.next;return{ok:true}}
+  if(cur.role!=="admin")fail("Solo un administrador puede hacer esto.");
+  if(path==="/api/admin/state")return{portals:M.portals,users:Object.values(M.users).map(pub)};
+  if(path==="/api/admin/portals"){M.portals=b.portals;return{portals:M.portals}}
+  if(path==="/api/admin/users"){const n=(b.username||"").toLowerCase();if(!/^[a-z0-9._-]{3,32}$/.test(n))fail("El usuario debe tener entre 3 y 32 caracteres: letras, números, punto, guion o guion bajo.");if(M.users[n])fail("Ese nombre de usuario ya existe.");if(!b.password||b.password.length<8)fail("La contraseña necesita al menos 8 caracteres.");M.users[n]={username:n,name:b.name,role:b.role,pw:b.password,portals:b.portals};return{user:pub(M.users[n])}}
+  const n=decodeURIComponent(path.split("/").pop()),u=M.users[n];if(!u)fail("Ese usuario no existe.");
+  if(method==="DELETE"){if(n===cur.username)fail("No puedes eliminar tu propio usuario.");delete M.users[n];return{ok:true}}
+  if(n===cur.username&&b.role!=="admin")fail("No puedes quitarte a ti mismo el rol de administrador.");
+  if(b.password&&b.password.length<8)fail("La contraseña necesita al menos 8 caracteres.");
+  Object.assign(u,{name:b.name,role:b.role,portals:b.portals});if(b.password)u.pw=b.password;return{user:pub(u)}
+}
+
+/* ================= Helpers ================= */
+const $=id=>document.getElementById(id);
+const isAdmin=()=>me&&me.role==="admin";
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function safeUrl(u){try{const x=new URL(u);return /^https?:$/.test(x.protocol)?x.href:"#"}catch(e){return "#"}}
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2600)}
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).close());
+
+/* ================= Views ================= */
+function showLogin(msg){
+  me=null;setEditing(false);
+  document.querySelectorAll("dialog[open]").forEach(d=>d.close());
+  $("hubView").hidden=true;$("loginView").hidden=false;
+  $("loginErr").textContent=msg||"";
+  $("loginHint").textContent=DEMO?"Vista previa: entra con admin / ElHub2026! o familia / familia123":"Acceso privado a los portales de maurosystem.com";
+  setTimeout(()=>$("lu").focus(),50);
+}
+function expired(){ if(me) showLogin("Tu sesión de 12 horas terminó. Vuelve a entrar.") }
+
+async function loadHub(){
+  const d=await api("GET","/api/me");
+  me=d.user;portals=d.portals;
+  $("loginView").hidden=true;$("hubView").hidden=false;$("demoBanner").hidden=!DEMO;
+  $("hello").textContent="Hola, "+(me.name||me.username);
+  document.querySelectorAll(".admin-only").forEach(e=>e.hidden=!isAdmin());
+  render();
+}
+
+function emblemBg(i){
+  const t=TINTS[i%TINTS.length];
+  return `<svg class="bg" viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true"><rect width="160" height="100" fill="${t}" opacity=".35"/><path d="M0 78 L28 50 L44 62 L70 30 L92 56 L112 40 L160 74 L160 100 L0 100Z" fill="#0c2016" opacity=".55"/><path d="M0 88 Q40 72 80 86 T160 82 L160 100 L0 100Z" fill="#0c2016" opacity=".7"/></svg>`;
+}
+function render(){
+  const g=$("grid");
+  const cards=portals.map((p,i)=>`
+    <article class="card">
+      <button class="card-edit" data-edit="${i}" aria-label="Editar ${esc(p.name)}">Editar</button>
+      <div class="emblem">${emblemBg(i)}${(ICONS[p.icon]||ICONS.link).replace("<svg",'<svg class="icon" aria-hidden="true"')}</div>
+      <h2>${esc(p.name)}</h2>
+      <div class="rule"></div>
+      <p>${esc(p.desc)}</p>
+      <a class="open" href="${esc(safeUrl(p.url))}" target="_blank" rel="noopener" ${safeUrl(p.url)==="#"?'aria-disabled="true"':""}>Abrir portal</a>
+    </article>`).join("");
+  g.innerHTML=(cards||`<div class="empty">Todavía no tienes bloques asignados. Pídele acceso al administrador.</div>`)+
+    (isAdmin()?`<button class="add-card" id="addCard">+ Añadir portal</button>`:"");
+  g.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openPortal(+b.dataset.edit));
+  if($("addCard")) $("addCard").onclick=()=>openPortal(-1);
+}
+
+/* ================= Login / logout ================= */
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();$("loginBtn").disabled=true;$("loginErr").textContent="";
+  try{await api("POST","/api/login",{username:$("lu").value.trim(),password:$("lp").value});$("lp").value="";await loadHub()}
+  catch(err){$("loginErr").textContent=err.message}
+  finally{$("loginBtn").disabled=false}
+});
+$("logoutBtn").onclick=async()=>{try{await api("POST","/api/logout")}catch(e){}showLogin()};
+
+/* ================= Portales (admin) ================= */
+function setEditing(on){
+  document.body.classList.toggle("editing",on);
+  $("editToggle").setAttribute("aria-pressed",on);
+  $("editToggle").textContent=on?"Terminar edición":"Editar portales";
+}
+$("editToggle").onclick=()=>setEditing(!document.body.classList.contains("editing"));
+
+let editing=-1;
+function openPortal(i){
+  editing=i;
+  const p=i>=0?portals[i]:{name:"",desc:"",url:"https://maurosystem.com/",icon:"leaf"};
+  $("editTitle").textContent=i>=0?"Editar portal":"Nuevo portal";
+  $("fName").value=p.name;$("fDesc").value=p.desc;$("fUrl").value=p.url;
+  $("delBtn").hidden=i<0;$("editErr").textContent="";
+  $("iconPick").innerHTML=Object.keys(ICONS).map(k=>`<label><input type="radio" name="ic" value="${k}" ${k===p.icon?"checked":""}><span class="sw" title="${k}">${ICONS[k]}</span></label>`).join("");
+  $("editDlg").showModal();
+}
+async function savePortals(next,msg){
+  const d=await api("PUT","/api/admin/portals",{portals:next});
+  portals=d.portals;render();toast(msg);
+}
+$("editForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const url=$("fUrl").value.trim();
+  if(safeUrl(url)==="#"){$("editErr").textContent="El enlace debe empezar con https:// o http://";return}
+  const icon=(document.querySelector('input[name="ic"]:checked')||{}).value||"link";
+  const p={id:editing>=0?portals[editing].id:"p"+Date.now().toString(36),name:$("fName").value.trim(),desc:$("fDesc").value.trim(),url,icon};
+  const next=portals.slice();if(editing>=0)next[editing]=p;else next.push(p);
+  try{await savePortals(next,"Portal guardado");$("editDlg").close()}catch(err){$("editErr").textContent=err.message}
+});
+$("delBtn").onclick=async()=>{
+  if(editing<0||!confirm(`¿Eliminar “${portals[editing].name}” del HUB?`))return;
+  const next=portals.filter((_,i)=>i!==editing);
+  try{await savePortals(next,"Portal eliminado");$("editDlg").close()}catch(err){$("editErr").textContent=err.message}
+};
+
+/* ================= Usuarios (admin) ================= */
+async function refreshUsers(){
+  adminState=await api("GET","/api/admin/state");
+  const total=adminState.portals.length;
+  $("usersList").innerHTML=adminState.users.sort((a,b)=>a.username.localeCompare(b.username)).map(u=>{
+    const n=u.role==="admin"?"Ve todos los bloques":`Ve ${u.portals.filter(id=>adminState.portals.some(p=>p.id===id)).length} de ${total} bloques`;
+    return `<li><div class="who"><b>${esc(u.name)}${u.role==="admin"?'<span class="tag">Admin</span>':""}</b><small>${esc(u.username)}. ${n}</small></div>
+      <button class="btn sm" data-uedit="${esc(u.username)}">Editar</button>
+      ${u.username===me.username?"":`<button class="btn sm del" data-udel="${esc(u.username)}">Eliminar</button>`}</li>`;
+  }).join("");
+  $("usersList").querySelectorAll("[data-uedit]").forEach(b=>b.onclick=()=>openUser(b.dataset.uedit));
+  $("usersList").querySelectorAll("[data-udel]").forEach(b=>b.onclick=()=>removeUser(b.dataset.udel));
+}
+$("usersBtn").onclick=async()=>{try{await refreshUsers();$("usersDlg").showModal()}catch(err){toast(err.message)}};
+$("newUserBtn").onclick=()=>openUser(null);
+
+let editingUser=null;
+function syncRole(){
+  const admin=$("uRole").value==="admin";
+  $("uChecks").classList.toggle("off",admin);
+  $("uChecks").querySelectorAll("input").forEach(i=>i.disabled=admin);
+  $("uNote").hidden=!admin;
+}
+$("uRole").onchange=syncRole;
+function openUser(username){
+  editingUser=username;
+  const u=username?adminState.users.find(x=>x.username===username):{name:"",username:"",role:"user",portals:[]};
+  $("userTitle").textContent=username?"Editar usuario":"Nuevo usuario";
+  $("uName").value=u.name;$("uUser").value=u.username;$("uUser").disabled=!!username;
+  $("uPass").value="";$("uPass").required=!username;
+  $("uPassLabel").textContent=username?"Nueva contraseña (déjala vacía para no cambiarla)":"Contraseña (mínimo 8 caracteres)";
+  $("uRole").value=u.role;
+  $("uChecks").innerHTML=adminState.portals.map(p=>`<label><input type="checkbox" value="${esc(p.id)}" ${u.portals.includes(p.id)?"checked":""}>${esc(p.name)}</label>`).join("");
+  syncRole();$("userErr").textContent="";
+  $("userDlg").showModal();
+}
+$("userForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const pw=$("uPass").value;
+  if(pw&&pw.length<8){$("userErr").textContent="La contraseña necesita al menos 8 caracteres.";return}
+  const body={name:$("uName").value.trim(),role:$("uRole").value,portals:[...$("uChecks").querySelectorAll("input:checked")].map(i=>i.value)};
+  if(pw)body.password=pw;
+  try{
+    if(editingUser) await api("PUT","/api/admin/users/"+encodeURIComponent(editingUser),body);
+    else await api("POST","/api/admin/users",{...body,username:$("uUser").value.trim().toLowerCase()});
+    $("userDlg").close();await refreshUsers();toast("Usuario guardado");
+    if(editingUser===me.username) await loadHub();
+  }catch(err){$("userErr").textContent=err.message}
+});
+async function removeUser(username){
+  if(!confirm(`¿Eliminar el usuario “${username}”? Ya no podrá entrar.`))return;
+  try{await api("DELETE","/api/admin/users/"+encodeURIComponent(username));await refreshUsers();toast("Usuario eliminado")}catch(err){toast(err.message)}
+}
+
+/* ================= Mi contraseña ================= */
+$("pwBtn").onclick=()=>{$("pCur").value="";$("pNew").value="";$("pwErr").textContent="";$("pwDlg").showModal()};
+$("pwForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  try{await api("POST","/api/password",{current:$("pCur").value,next:$("pNew").value});$("pwDlg").close();toast("Contraseña actualizada")}
+  catch(err){$("pwErr").textContent=err.message}
+});
+
+/* ================= Arranque ================= */
+(async function boot(){
+  try{
+    const r=await fetch("/api/me",{credentials:"same-origin"});
+    const isJson=(r.headers.get("content-type")||"").includes("application/json");
+    if(!isJson) throw new Error("no api");
+    if(r.ok) await loadHub(); else showLogin();
+  }catch(e){ DEMO=true; showLogin(); }
+  // Revisa cada 5 minutos si la sesión de 12 horas sigue activa
+  setInterval(()=>{ if(me&&!DEMO) api("GET","/api/me").catch(()=>{}) },5*60*1000);
+})();
+})();
+</script>
+</body>
+</html>
