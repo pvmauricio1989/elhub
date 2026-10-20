@@ -11,7 +11,7 @@
     {
       "binding": "HUB",
       // Paso 2 de la guía: pega aquí el ID de tu KV namespace
-      "id": "P39c09598e6eb4df59df51613f560e67e"
+      "id": "39c09598e6eb4df59df51613f560e67e"
     }
   ],
   "observability": { "enabled": true }
